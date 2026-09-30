@@ -333,7 +333,30 @@ type IntegrationDeviceUplinkStats struct {
 	TxRateBps FlexInt `json:"txRateBps"`
 }
 
-// IntegrationDeviceStats holds device statistics from the Integration/v1 API.
+// IntegrationDevice is one entry of the Integration/v1 device list
+// (GET /proxy/network/integration/v1/sites/{siteId}/devices). It carries the
+// identity the statistics endpoint omits.
+type IntegrationDevice struct {
+	ID                string `json:"id"`
+	Name              string `json:"name"`
+	MACAddress        string `json:"macAddress"`
+	Model             string `json:"model"`
+	IPAddress         string `json:"ipAddress"`
+	State             string `json:"state"`
+	FirmwareVersion   string `json:"firmwareVersion"`
+	FirmwareUpdatable bool   `json:"firmwareUpdatable"`
+	Supported         bool   `json:"supported"`
+	SiteName          string `json:"-"`
+}
+
+// IntegrationDeviceStats holds device statistics from the Integration/v1 API
+// (GET /proxy/network/integration/v1/sites/{siteId}/devices/{deviceId}/statistics/latest).
+//
+// The payload neither echoes the device ID nor carries a name; DeviceID, Name,
+// MAC, Model and SiteName are filled in from the request and the device list by
+// GetIntegrationDeviceStats and GetAllIntegrationDeviceStats. The controller
+// nests the uplink and radio figures differently from the flat Radios and
+// Uplinks slices exposed here; UnmarshalJSON maps both shapes.
 type IntegrationDeviceStats struct {
 	CPUUtilizationPct    FlexInt                        `json:"cpuUtilizationPct"`
 	DeviceID             string                         `json:"deviceId"`
@@ -346,6 +369,11 @@ type IntegrationDeviceStats struct {
 	Radios               []IntegrationDeviceRadioStats  `json:"radios"`
 	Uplinks              []IntegrationDeviceUplinkStats `json:"uplinks"`
 	UptimeSec            FlexInt                        `json:"uptimeSec"`
+	// Identity, taken from the device list rather than the statistics payload.
+	Name     string `json:"-"`
+	MAC      string `json:"-"`
+	Model    string `json:"-"`
+	SiteName string `json:"-"`
 }
 
 // WifiBroadcastSecurityConfiguration holds security settings for a WiFi broadcast.
