@@ -70,6 +70,12 @@ type FirewallPolicy struct {
 	Protocol            string                 `json:"protocol"` // all, tcp, udp, icmp, etc.
 	Schedule            FirewallPolicySchedule `json:"schedule"`
 	Source              FirewallPolicyEndpoint `json:"source"`
+	// Hits is the controller's cumulative match counter for the policy and
+	// LastHit the Unix time in milliseconds of the most recent match, 0 when
+	// the policy never matched. The controller refreshes both roughly every
+	// six minutes, so consecutive polls often return identical values.
+	Hits    FlexInt `json:"hits"`
+	LastHit FlexInt `json:"last_hit"`
 
 	SiteName   string `json:"-"`
 	SourceName string `json:"-"`
